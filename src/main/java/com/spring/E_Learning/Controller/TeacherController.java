@@ -1,11 +1,9 @@
 package com.spring.E_Learning.Controller;
 
 
-import com.spring.E_Learning.DTOs.CourseRequestDto;
-import com.spring.E_Learning.DTOs.CourseResponseDto;
-import com.spring.E_Learning.DTOs.SessionRequestDto;
-import com.spring.E_Learning.DTOs.SessionResponseDto;
+import com.spring.E_Learning.DTOs.*;
 import com.spring.E_Learning.Service.CourseService;
+import com.spring.E_Learning.Service.ExamService;
 import com.spring.E_Learning.Service.FileUploadService;
 import com.spring.E_Learning.Service.SessionService;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +21,7 @@ public class TeacherController {
     private final CourseService courseService;
     private final SessionService sessionService;
     private final FileUploadService fileUploadService;
+    private final ExamService examService;
 
 
     //Courses
@@ -61,6 +60,19 @@ public class TeacherController {
     @GetMapping("/sessions/Course/{id}")
     public ResponseEntity<List<SessionResponseDto>> getAllSessions(@PathVariable int id) {
         return ResponseEntity.ok(sessionService.getSessionsByCourse(id));
+    }
+
+
+
+    //Exams
+    @PostMapping("/exams")
+    public ResponseEntity<ExamResponseDto> createExam(@RequestBody ExamRequestDto dto) {
+        return ResponseEntity.ok(examService.createExam(dto));
+    }
+
+    @GetMapping("/exams/{id}")
+    public ResponseEntity<List<ExamResponseDto>> getAllExams(@PathVariable int id) {
+        return ResponseEntity.ok(examService.getExamsByCourse(id));
     }
 
 
