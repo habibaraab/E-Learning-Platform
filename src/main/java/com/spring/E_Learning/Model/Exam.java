@@ -7,6 +7,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,5 +28,7 @@ public class Exam {
     @JoinColumn(name = "course_id")
     private Course course;
 
+    @OneToMany(mappedBy = "exam", cascade = CascadeType.ALL)
+    private List<Question>questions=new ArrayList<>();
     
 }
