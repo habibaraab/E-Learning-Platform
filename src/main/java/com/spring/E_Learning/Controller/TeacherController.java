@@ -19,10 +19,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/teacher")
 @RequiredArgsConstructor
-public class CourseController {
+public class TeacherController {
     private final CourseService courseService;
     private final SessionService sessionService;
     private final FileUploadService fileUploadService;
+
+
+    //Courses
 
     @PostMapping
     public ResponseEntity<CourseResponseDto> createCourse(@RequestBody CourseRequestDto dto) {
@@ -40,6 +43,8 @@ public class CourseController {
         return ResponseEntity.noContent().build();
     }
 
+
+    // Sessions
     @PostMapping(value= "/sessions", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SessionResponseDto> createSession(
             @RequestParam String title,
@@ -53,10 +58,12 @@ public class CourseController {
         return ResponseEntity.ok(sessionService.addSession(dto));
     }
 
-    @GetMapping("/sessions/{id}")
+    @GetMapping("/sessions/Course/{id}")
     public ResponseEntity<List<SessionResponseDto>> getAllSessions(@PathVariable int id) {
         return ResponseEntity.ok(sessionService.getSessionsByCourse(id));
     }
+
+
 
 
 }
