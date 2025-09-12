@@ -2,6 +2,7 @@ package com.spring.E_Learning.Controller;
 
 
 import com.spring.E_Learning.DTOs.*;
+import com.spring.E_Learning.Enum.RequestStatus;
 import com.spring.E_Learning.Service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -20,7 +21,7 @@ public class TeacherController {
     private final FileUploadService fileUploadService;
     private final ExamService examService;
     private final ExamSubmissionService examSubmissionService;
-
+    private final StudentRequestService studentRequestService;
 
     //Courses
 
@@ -78,6 +79,15 @@ public class TeacherController {
             @PathVariable int examId) {
         return ResponseEntity.ok(examSubmissionService.getExamResults(examId));
     }
+
+
+    @PutMapping("/{request_id}/status")
+    public ResponseEntity<StudentRequestDto> updateStatus(
+            @PathVariable int request_id,
+            @RequestParam RequestStatus status) {
+        return ResponseEntity.ok(studentRequestService.updateStatus(request_id, status));
+    }
+
 
 
 

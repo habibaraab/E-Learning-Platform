@@ -4,6 +4,8 @@ package com.spring.E_Learning.Service;
 import com.spring.E_Learning.DTOs.ExamAnswerDto;
 import com.spring.E_Learning.DTOs.ExamSubmissionRequest;
 import com.spring.E_Learning.DTOs.ExamSubmissionResponse;
+import com.spring.E_Learning.Enum.RequestStatus;
+import com.spring.E_Learning.Enum.RequestType;
 import com.spring.E_Learning.Enum.Role;
 import com.spring.E_Learning.Model.*;
 import com.spring.E_Learning.Repository.*;
@@ -26,7 +28,7 @@ public class ExamSubmissionService {
     private final OptionRepository optionRepository;
     private final ExamSubmissionRepository submissionRepository;
     private final UserRepository userRepository;
-
+    private final StudentRequestRepository studentRequestRepository;
 
     public ExamSubmissionResponse submitExam(int studentId, ExamSubmissionRequest request) {
         Exam exam = examRepository.findById(request.getExamId())
@@ -42,9 +44,22 @@ public class ExamSubmissionService {
         Boolean alreadySubmitted = submissionRepository
                 .existsByExamIdAndStudentId(exam.getId(), student.getId());
 
+        StudentRequest retakeRequest = null;
+
         if (alreadySubmitted) {
-            throw new RuntimeException("You have already submitted this exam");
+            retakeRequest = studentRequestRepository
+                    .findTopByStudentIdAndExamIdAndTypeAndStatus(
+                            student.getId(),
+                            exam.getId(),
+                            RequestType.RETAKE_EXAM,
+                            RequestStatus.APPROVED
+                    ).orElse(null);
+
+            if (retakeRequest == null) {
+                throw new RuntimeException("You have already submitted this exam");
+            }
         }
+
         ExamSubmission submission = ExamSubmission.builder()
                 .exam(exam)
                 .student(student)
@@ -79,12 +94,18 @@ public class ExamSubmissionService {
 
         ExamSubmission savedSubmission = submissionRepository.save(submission);
 
+        if (retakeRequest != null) {
+            retakeRequest.setStatus(RequestStatus.EXPIRED);
+            studentRequestRepository.save(retakeRequest);
+        }
+
         return new ExamSubmissionResponse(
                 savedSubmission.getId(),
                 savedSubmission.getScore(),
                 savedSubmission.getSubmittedAt()
         );
     }
+
 
     public List<ExamSubmissionResponse> getExamResults(int examId) {
         return submissionRepository.findByExamId(examId)
