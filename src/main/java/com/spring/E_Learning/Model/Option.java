@@ -1,16 +1,14 @@
 package com.spring.E_Learning.Model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
 @Getter
+@Builder
 public class Option {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -2,10 +2,7 @@ package com.spring.E_Learning.Controller;
 
 
 import com.spring.E_Learning.DTOs.*;
-import com.spring.E_Learning.Service.CourseService;
-import com.spring.E_Learning.Service.ExamService;
-import com.spring.E_Learning.Service.FileUploadService;
-import com.spring.E_Learning.Service.SessionService;
+import com.spring.E_Learning.Service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +19,7 @@ public class TeacherController {
     private final SessionService sessionService;
     private final FileUploadService fileUploadService;
     private final ExamService examService;
+    private final ExamSubmissionService examSubmissionService;
 
 
     //Courses
@@ -70,9 +68,15 @@ public class TeacherController {
         return ResponseEntity.ok(examService.createExam(dto));
     }
 
-    @GetMapping("/exams/{id}")
+    @GetMapping("/exams/Course/{id}")
     public ResponseEntity<List<ExamResponseDto>> getAllExams(@PathVariable int id) {
         return ResponseEntity.ok(examService.getExamsByCourse(id));
+    }
+
+    @GetMapping("/exams/{examId}/results")
+    public ResponseEntity<List<ExamSubmissionResponse>> getExamResults(
+            @PathVariable int examId) {
+        return ResponseEntity.ok(examSubmissionService.getExamResults(examId));
     }
 
 

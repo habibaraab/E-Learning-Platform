@@ -10,6 +10,7 @@ import com.spring.E_Learning.Model.User;
 import com.spring.E_Learning.Repository.TokenRepository;
 import com.spring.E_Learning.Repository.UserRepository;
 import com.spring.E_Learning.Security.JwtService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +81,7 @@ public class AuthService {
 
         // If authentication is successful, generate a JWT token
         log.debug("Fetching user details from repository for token generation.");
-        User user = userRepository.findUserByEmail(request.getEmail());
+        User user = userRepository.findUserByEmail(request.getEmail()).orElseThrow(()-> new EntityNotFoundException("User not found"));
         Map<String, Object> claims = new HashMap<>();
 
         log.debug("Generating new tokens for user: {}", request.getEmail());
