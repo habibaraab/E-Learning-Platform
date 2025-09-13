@@ -29,9 +29,44 @@ public class StudentRequestService {
     private final ExamRepository examRepository;
     private final CourseRepository courseRepository;
 
+//    public StudentRequestDto createRequest(StudentRequestDto dto) {
+//        User student = userRepository.findById(dto.getStudentId())
+//                .orElseThrow(() -> new EntityNotFoundException("Student not found"));
+//
+//        Course course = courseRepository.findById(dto.getCourseId())
+//                .orElseThrow(() -> new EntityNotFoundException("Course not found"));
+//
+//        Exam exam = null;
+//        if (dto.getType() == RequestType.RETAKE_EXAM) {
+//            exam = examRepository.findById(dto.getExamId())
+//                    .orElseThrow(() -> new EntityNotFoundException("Exam not found"));
+//        }
+//
+//        StudentRequest request = StudentRequest.builder()
+//                .student(student)
+//                .type(dto.getType())
+//                .course(course)
+//                .exam(exam)
+//                .status(RequestStatus.PENDING)
+//                .build();
+//
+//        StudentRequest saved = studentRequestRepository.save(request);
+//
+//        dto.setId(saved.getId());
+//        dto.setStatus(saved.getStatus());
+//        return dto;
+//    }
+
     public StudentRequestDto createRequest(StudentRequestDto dto) {
-        User student = userRepository.findById(dto.getStudentId())
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        User student = userRepository.findUserByEmail(username)
                 .orElseThrow(() -> new EntityNotFoundException("Student not found"));
+
+        if (!"STUDENT".equalsIgnoreCase(student.getRole().name())) {
+            throw new RuntimeException("Only students can send requests");
+        }
 
         Course course = courseRepository.findById(dto.getCourseId())
                 .orElseThrow(() -> new EntityNotFoundException("Course not found"));
@@ -52,10 +87,17 @@ public class StudentRequestService {
 
         StudentRequest saved = studentRequestRepository.save(request);
 
-        dto.setId(saved.getId());
-        dto.setStatus(saved.getStatus());
-        return dto;
+        StudentRequestDto response = new StudentRequestDto();
+        response.setId(saved.getId());
+        response.setStudentId(student.getId());
+        response.setCourseId(course.getId());
+        response.setExamId(exam != null ? exam.getId() : null);
+        response.setType(saved.getType());
+        response.setStatus(saved.getStatus());
+
+        return response;
     }
+
 
 
     public StudentRequestDto updateStatus(int requestId, RequestStatus status) {
