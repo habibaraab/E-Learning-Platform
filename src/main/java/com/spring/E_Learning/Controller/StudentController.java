@@ -18,10 +18,10 @@ import java.util.List;
 public class StudentController {
     private final ExamSubmissionService examSubmissionService;
     private final StudentRequestService studentRequestService;
-    @PostMapping("/{id}/sumbit")
-    public ResponseEntity<ExamSubmissionResponse>sumbitExam(@PathVariable int id,@RequestBody ExamSubmissionRequest examSubmissionRequest) {
+    @PostMapping("/sumbit")
+    public ResponseEntity<ExamSubmissionResponse>sumbitExam(@RequestBody ExamSubmissionRequest examSubmissionRequest) {
 
-        return ResponseEntity.ok(examSubmissionService.submitExam(id, examSubmissionRequest));
+        return ResponseEntity.ok(examSubmissionService.submitExam( examSubmissionRequest));
     }
 
     @GetMapping("/{studentId}/results")

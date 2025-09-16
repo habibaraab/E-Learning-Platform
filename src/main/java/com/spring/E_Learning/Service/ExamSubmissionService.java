@@ -11,6 +11,7 @@ import com.spring.E_Learning.Model.*;
 import com.spring.E_Learning.Repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -30,22 +31,26 @@ public class ExamSubmissionService {
     private final UserRepository userRepository;
     private final StudentRequestRepository studentRequestRepository;
 
-    public ExamSubmissionResponse submitExam(int studentId, ExamSubmissionRequest request) {
-        Exam exam = examRepository.findById(request.getExamId())
-                .orElseThrow(() -> new EntityNotFoundException("Exam not found"));
+    public ExamSubmissionResponse submitExam(ExamSubmissionRequest request) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
 
-        User student = userRepository.findById(studentId)
-                .orElseThrow(() -> new EntityNotFoundException("Student not found"));
+        User loggedInUser = userRepository.findUserByEmail(username)
+                .orElseThrow(() -> new EntityNotFoundException("Logged-in user not found"));
 
-        if (!"STUDENT".equalsIgnoreCase(student.getRole().name())) {
+        if (!"STUDENT".equalsIgnoreCase(loggedInUser.getRole().name())) {
             throw new RuntimeException("Only students can submit exams");
         }
 
-        Boolean alreadySubmitted = submissionRepository
+        Exam exam = examRepository.findById(request.getExamId())
+                .orElseThrow(() -> new EntityNotFoundException("Exam not found"));
+
+        User student = loggedInUser;
+
+        boolean alreadySubmitted = submissionRepository
                 .existsByExamIdAndStudentId(exam.getId(), student.getId());
 
         StudentRequest retakeRequest = null;
-
         if (alreadySubmitted) {
             retakeRequest = studentRequestRepository
                     .findTopByStudentIdAndExamIdAndTypeAndStatus(
@@ -105,6 +110,7 @@ public class ExamSubmissionService {
                 savedSubmission.getSubmittedAt()
         );
     }
+
 
 
     public List<ExamSubmissionResponse> getExamResults(int examId) {
