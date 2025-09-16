@@ -1,6 +1,6 @@
 package com.spring.E_Learning.Service;
 
-
+import com.spring.E_Learning.DTOs.NotificationDto;
 import com.spring.E_Learning.DTOs.StudentRequestDto;
 import com.spring.E_Learning.Enum.RequestStatus;
 import com.spring.E_Learning.Enum.RequestType;
@@ -8,16 +8,14 @@ import com.spring.E_Learning.Model.Course;
 import com.spring.E_Learning.Model.Exam;
 import com.spring.E_Learning.Model.StudentRequest;
 import com.spring.E_Learning.Model.User;
-import com.spring.E_Learning.Repository.CourseRepository;
-import com.spring.E_Learning.Repository.ExamRepository;
-import com.spring.E_Learning.Repository.StudentRequestRepository;
-import com.spring.E_Learning.Repository.UserRepository;
+import com.spring.E_Learning.Repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +26,7 @@ public class StudentRequestService {
     private final UserRepository userRepository;
     private final ExamRepository examRepository;
     private final CourseRepository courseRepository;
+    private final NotificationScheduler notificationService;
 
 //    public StudentRequestDto createRequest(StudentRequestDto dto) {
 //        User student = userRepository.findById(dto.getStudentId())
@@ -107,6 +106,17 @@ public class StudentRequestService {
         request.setStatus(status);
         StudentRequest updated = studentRequestRepository.save(request);
 
+        NotificationDto notif = NotificationDto.builder()
+                .title("Exam Request Update")
+                .message(status == RequestStatus.APPROVED
+                        ? "Your exam retake request has been APPROVED."
+                        : "Your exam retake request has been REJECTED.")
+                .userId(updated.getStudent().getId())
+                .createdAt(LocalDateTime.now())
+                .read(true)
+                .build();
+        notificationService.createNotification(notif);
+
         StudentRequestDto dto = new StudentRequestDto();
         dto.setId(updated.getId());
         dto.setStudentId(updated.getStudent().getId());
@@ -115,6 +125,7 @@ public class StudentRequestService {
         dto.setExamId(updated.getExam() != null ? updated.getExam().getId() : null);
         dto.setStatus(updated.getStatus());
         return dto;
+
     }
 
     public List<StudentRequestDto> getStudentRequests(int studentId) {
