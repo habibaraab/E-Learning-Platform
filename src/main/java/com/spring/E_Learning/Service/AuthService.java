@@ -4,6 +4,7 @@ import com.spring.E_Learning.DTOs.AuthenticationResponse;
 import com.spring.E_Learning.DTOs.LoginRequest;
 import com.spring.E_Learning.DTOs.Mapper.UserMapper;
 import com.spring.E_Learning.DTOs.UserRequestDto;
+import com.spring.E_Learning.Enum.Role;
 import com.spring.E_Learning.Enum.TokenType;
 import com.spring.E_Learning.Model.Token;
 import com.spring.E_Learning.Model.User;
@@ -66,33 +67,36 @@ public class AuthService {
                 .build();
     }
 
-    // This method is used to authenticate the user and generate a JWT token
     public AuthenticationResponse login(LoginRequest request) {
         log.info("Login attempt for user: {}", request.getEmail());
 
         try {
-            // Authenticate the user
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+            );
             log.info("Authentication successful for user: {}", request.getEmail());
         } catch (Exception e) {
             log.warn("Authentication failed for user: {}. Reason: {}", request.getEmail(), e.getMessage());
             throw e;
         }
 
-        // If authentication is successful, generate a JWT token
-        log.debug("Fetching user details from repository for token generation.");
-        User user = userRepository.findUserByEmail(request.getEmail()).orElseThrow(()-> new EntityNotFoundException("User not found"));
-        Map<String, Object> claims = new HashMap<>();
+        User user = userRepository.findUserByEmail(request.getEmail())
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        log.debug("Generating new tokens for user: {}", request.getEmail());
+        if (user.getRole() == Role.TEACHER && !user.isActiva()) {
+            log.warn("Teacher account not activated for user: {}", request.getEmail());
+            throw new RuntimeException("Your account is not activated yet. Please contact the administrator.");
+        }
+
+
+        Map<String, Object> claims = new HashMap<>();
         String accessToken = jwtService.generateToken(user, claims);
         String refreshToken = jwtService.generateRefreshToken(user);
 
-        // Save the token in the database
         saveUserToken(user, accessToken);
 
         log.info("Login process completed successfully for user: {}", request.getEmail());
-        //  return two token in response
+
         return AuthenticationResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)

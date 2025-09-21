@@ -35,19 +35,18 @@ public class User implements UserDetails{
     private Role role;
 
 
-    // طالب مسجّل في كورسات
+     @Builder.Default
+    private boolean activa=false;
+
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Enrollment> enrollments = new HashSet<>();
 
-    // مدفوعات الطالب
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Payment> payments = new HashSet<>();
 
-    // لو فيه امتحانات حلها الطالب
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ExamSubmission> examSubmissions = new HashSet<>();
 
-    // لو فيه Requests زي إعادة الامتحان
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<StudentRequest> studentRequests = new HashSet<>();
 
@@ -69,23 +68,6 @@ public class User implements UserDetails{
         return email;
     }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
 
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
 
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 }
