@@ -27,9 +27,9 @@ public class StudentController {
     public ResponseEntity<PaymentDto> createPayment(@RequestBody PaymentDto dto) {
         return ResponseEntity.ok(paymentService.createPayment(dto));
     }
-    @GetMapping("/getCourses/{studentId}")
-    public ResponseEntity<List<PaymentDto>> getPayments(@PathVariable int studentId) {
-        return ResponseEntity.ok(paymentService.getPayments(studentId));
+    @GetMapping("/getCourses")
+    public ResponseEntity<List<PaymentDto>> getPayments() {
+        return ResponseEntity.ok(paymentService.getPayments());
     }
 
 

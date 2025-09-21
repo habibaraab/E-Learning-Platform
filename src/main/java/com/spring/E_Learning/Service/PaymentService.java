@@ -15,6 +15,7 @@ import com.spring.E_Learning.Repository.PaymentRepository;
 import com.spring.E_Learning.Repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,20 +80,29 @@ public class PaymentService {
         return dto;
     }
 
-    public List<PaymentDto> getPayments(int studentId) {
-        return paymentRepo.findByStudentId(studentId)
+    public List<PaymentDto> getPayments() {
+        User userDetails = (User)
+                SecurityContextHolder.getContext()
+                        .getAuthentication()
+                        .getPrincipal();
+
+        int currentStudentId = userDetails.getId();
+
+        return paymentRepo.findByStudentId(currentStudentId)
                 .stream()
-                .map(p -> {
-                    PaymentDto dto = new PaymentDto();
-                    dto.setId(p.getId());
-                    dto.setAmount(p.getAmount());
-                    dto.setStatus(p.getStatus());
-                    dto.setCourseId(p.getCourse().getId());
-                    dto.setStudentId(p.getStudent().getId());
-                    dto.setCreatedAt(p.getCreatedAt());
-                    return dto;
-                })
+                .map(this::mapToDto)
                 .collect(Collectors.toList());
+    }
+
+    private PaymentDto mapToDto(Payment p) {
+        PaymentDto dto = new PaymentDto();
+        dto.setId(p.getId());
+        dto.setAmount(p.getAmount());
+        dto.setStatus(p.getStatus());
+        dto.setCourseId(p.getCourse().getId());
+        dto.setStudentId(p.getStudent().getId());
+        dto.setCreatedAt(p.getCreatedAt());
+        return dto;
     }
 
 }

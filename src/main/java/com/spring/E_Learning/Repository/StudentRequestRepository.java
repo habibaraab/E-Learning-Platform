@@ -20,4 +20,7 @@ public interface StudentRequestRepository extends JpaRepository<StudentRequest, 
             RequestType type,
             RequestStatus status
     );
+
+    Long countByStatus(RequestStatus status);
 }
+
