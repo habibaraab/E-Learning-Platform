@@ -1,10 +1,9 @@
 package com.spring.E_Learning.Controller;
 
 
-import com.spring.E_Learning.DTOs.AuthenticationResponse;
-import com.spring.E_Learning.DTOs.LoginRequest;
-import com.spring.E_Learning.DTOs.UserRequestDto;
+import com.spring.E_Learning.DTOs.*;
 import com.spring.E_Learning.Service.AuthService;
+import com.spring.E_Learning.Service.PasswordResetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,11 +14,13 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
+@RequiredArgsConstructor
 public class authController {
 
 
-    @Autowired
-    private  AuthService authService;
+    private final AuthService authService;
+    private final PasswordResetService passwordResetService;
+
 
 
     @PostMapping("/login")
@@ -30,5 +31,21 @@ public class authController {
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody UserRequestDto registerRequest) {
         return ResponseEntity.ok(authService.register(registerRequest));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        passwordResetService.sendResetCode(request.getEmail());
+        return ResponseEntity.ok("Reset code sent to your email");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequest request) {
+        passwordResetService.resetPassword(
+                request.getEmail(),
+                request.getCode(),
+                request.getNewPassword()
+        );
+        return ResponseEntity.ok("Password has been reset successfully");
     }
 }
