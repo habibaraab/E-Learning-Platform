@@ -8,7 +8,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -31,6 +33,25 @@ public class User implements UserDetails{
     private String email;
      @Enumerated(EnumType.STRING)
     private Role role;
+
+
+    // طالب مسجّل في كورسات
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Enrollment> enrollments = new HashSet<>();
+
+    // مدفوعات الطالب
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Payment> payments = new HashSet<>();
+
+    // لو فيه امتحانات حلها الطالب
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ExamSubmission> examSubmissions = new HashSet<>();
+
+    // لو فيه Requests زي إعادة الامتحان
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<StudentRequest> studentRequests = new HashSet<>();
+
+
 
 
     @Override

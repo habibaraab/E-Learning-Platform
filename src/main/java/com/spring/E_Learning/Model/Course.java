@@ -4,6 +4,7 @@ package com.spring.E_Learning.Model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,6 +23,10 @@ public class Course {
     private String title;
 
     private String description;
+
+
+    @Column(nullable = false)
+    private BigDecimal price;
 
     @ManyToOne
     @JoinColumn(name = "teacher_id")

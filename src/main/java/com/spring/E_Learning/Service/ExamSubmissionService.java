@@ -29,6 +29,7 @@ public class ExamSubmissionService {
     private final OptionRepository optionRepository;
     private final ExamSubmissionRepository submissionRepository;
     private final UserRepository userRepository;
+    private final EnrollmentRepository enrollmentRepository;
     private final StudentRequestRepository studentRequestRepository;
 
     public ExamSubmissionResponse submitExam(ExamSubmissionRequest request) {
@@ -44,6 +45,16 @@ public class ExamSubmissionService {
 
         Exam exam = examRepository.findById(request.getExamId())
                 .orElseThrow(() -> new EntityNotFoundException("Exam not found"));
+
+        // check if student enrolled in course
+        int courseId = exam.getCourse().getId();
+        boolean enrolled = enrollmentRepository
+                .existsByStudentIdAndCourseId(loggedInUser.getId(), courseId);
+
+        if (!enrolled) {
+            throw new RuntimeException("You are not enrolled in the course for this exam");
+        }
+
 
         User student = loggedInUser;
 

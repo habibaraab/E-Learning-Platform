@@ -3,8 +3,10 @@ package com.spring.E_Learning.Controller;
 
 import com.spring.E_Learning.DTOs.ExamSubmissionRequest;
 import com.spring.E_Learning.DTOs.ExamSubmissionResponse;
+import com.spring.E_Learning.DTOs.PaymentDto;
 import com.spring.E_Learning.DTOs.StudentRequestDto;
 import com.spring.E_Learning.Service.ExamSubmissionService;
+import com.spring.E_Learning.Service.PaymentService;
 import com.spring.E_Learning.Service.StudentRequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,19 @@ import java.util.List;
 public class StudentController {
     private final ExamSubmissionService examSubmissionService;
     private final StudentRequestService studentRequestService;
+
+    private final PaymentService paymentService;
+
+    @PostMapping("/payment")
+    public ResponseEntity<PaymentDto> createPayment(@RequestBody PaymentDto dto) {
+        return ResponseEntity.ok(paymentService.createPayment(dto));
+    }
+    @GetMapping("/getCourses/{studentId}")
+    public ResponseEntity<List<PaymentDto>> getPayments(@PathVariable int studentId) {
+        return ResponseEntity.ok(paymentService.getPayments(studentId));
+    }
+
+
     @PostMapping("/sumbit")
     public ResponseEntity<ExamSubmissionResponse>sumbitExam(@RequestBody ExamSubmissionRequest examSubmissionRequest) {
 
