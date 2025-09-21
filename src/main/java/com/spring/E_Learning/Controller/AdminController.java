@@ -8,6 +8,7 @@ import com.spring.E_Learning.Repository.CourseRepository;
 import com.spring.E_Learning.Repository.EnrollmentRepository;
 import com.spring.E_Learning.Repository.PaymentRepository;
 import com.spring.E_Learning.Repository.UserRepository;
+import com.spring.E_Learning.Service.AdminService;
 import com.spring.E_Learning.Service.ReportService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -20,26 +21,20 @@ import org.springframework.web.bind.annotation.*;
 public class AdminController {
 
     private final ReportService reportService;
+    private final AdminService adminService;
 
+    @PutMapping("/teachers/{teacherId}/enable")
+    public ResponseEntity<String> enableTeacher(@PathVariable int teacherId) {
+        adminService.enableTeacher(teacherId);
+        return ResponseEntity.ok("Teacher account activated");
+    }
 
-        private final UserRepository userRepository;
-        private final CourseRepository courseRepository;
-        private final PaymentRepository paymentRepository;
-        private final EnrollmentRepository enrollmentRepository;
+    @PutMapping("/users/{userId}/disable")
+    public ResponseEntity<String> disableUser(@PathVariable int userId) {
+        adminService.disableUser(userId);
+        return ResponseEntity.ok("User disabled");
+    }
 
-        @PutMapping("/teachers/{teacherId}/enable")
-        public ResponseEntity<String> enableTeacher(@PathVariable int teacherId) {
-            User teacher = userRepository.findById(teacherId)
-                    .orElseThrow(() -> new EntityNotFoundException("Teacher not found"));
-
-            if (teacher.getRole() != Role.TEACHER) {
-                throw new IllegalArgumentException("User is not a teacher");
-            }
-
-            teacher.setActiva(true);
-            userRepository.save(teacher);
-            return ResponseEntity.ok("Teacher account activated");
-        }
 
     @GetMapping("/report")
     public ResponseEntity<ReportDto>getReport(){
@@ -47,12 +42,4 @@ public class AdminController {
     }
 
 
-    @PutMapping("/users/{userId}/disable")
-    public ResponseEntity<String> disableUser(@PathVariable int userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-        user.setActiva(false);
-        userRepository.save(user);
-        return ResponseEntity.ok("User disabled");
-    }
 }
