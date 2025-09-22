@@ -7,6 +7,8 @@ import com.spring.E_Learning.Service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -19,6 +21,10 @@ public class AdminController {
 
     private final ReportService reportService;
     private final AdminService adminService;
+    private final SimpMessagingTemplate messagingTemplate;
+
+
+
 
     @PutMapping("/teachers/{teacherId}/enable")
     public ResponseEntity<String> enableTeacher(@PathVariable int teacherId) {
@@ -32,23 +38,32 @@ public class AdminController {
         return ResponseEntity.ok("User disabled");
     }
 
-    @GetMapping( path = "/report/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter streamStats() {
-        SseEmitter emitter = new SseEmitter();
 
-        Executors.newSingleThreadExecutor().submit(() -> {
-            try {
-                while (true) {
-                    DashboardStatsDto stats = reportService.getDashboardReport();
-                    emitter.send(stats);
-                    Thread.sleep(3000);
-                }
-            } catch (Exception e) {
-                emitter.completeWithError(e);
-            }
-        });
+    //SSE using Emitter for Live Dashboard
+//    @GetMapping( path = "/report/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+//    public SseEmitter streamStats() {
+//        SseEmitter emitter = new SseEmitter();
+//
+//        Executors.newSingleThreadExecutor().submit(() -> {
+//            try {
+//                while (true) {
+//                    DashboardStatsDto stats = reportService.getDashboardReport();
+//                    emitter.send(stats);
+//                    Thread.sleep(3000);
+//                }
+//            } catch (Exception e) {
+//                emitter.completeWithError(e);
+//            }
+//        });
+//
+//        return emitter;
+//    }
 
-        return emitter;
+    //WebSocket for LiveDashboard
+    @Scheduled(fixedRate = 3000)
+    public void broadcastStats() {
+        DashboardStatsDto stats = reportService.getDashboardReport();
+        messagingTemplate.convertAndSend("/topic/dashboard", stats);
     }
 
 }
