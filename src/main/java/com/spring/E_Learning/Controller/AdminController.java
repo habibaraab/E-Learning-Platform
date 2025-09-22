@@ -40,30 +40,30 @@ public class AdminController {
 
 
     //SSE using Emitter for Live Dashboard
-//    @GetMapping( path = "/report/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-//    public SseEmitter streamStats() {
-//        SseEmitter emitter = new SseEmitter();
-//
-//        Executors.newSingleThreadExecutor().submit(() -> {
-//            try {
-//                while (true) {
-//                    DashboardStatsDto stats = reportService.getDashboardReport();
-//                    emitter.send(stats);
-//                    Thread.sleep(3000);
-//                }
-//            } catch (Exception e) {
-//                emitter.completeWithError(e);
-//            }
-//        });
-//
-//        return emitter;
-//    }
+    @GetMapping( path = "/report/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter streamStats() {
+        SseEmitter emitter = new SseEmitter();
+
+        Executors.newSingleThreadExecutor().submit(() -> {
+            try {
+                while (true) {
+                    DashboardStatsDto stats = reportService.getDashboardReport();
+                    emitter.send(stats);
+                    Thread.sleep(3000);
+                }
+            } catch (Exception e) {
+                emitter.completeWithError(e);
+            }
+        });
+
+        return emitter;
+    }
 
     //WebSocket for LiveDashboard
-    @Scheduled(fixedRate = 3000)
-    public void broadcastStats() {
-        DashboardStatsDto stats = reportService.getDashboardReport();
-        messagingTemplate.convertAndSend("/topic/dashboard", stats);
-    }
+//    @Scheduled(fixedRate = 3000)
+//    public void broadcastStats() {
+//        DashboardStatsDto stats = reportService.getDashboardReport();
+//        messagingTemplate.convertAndSend("/topic/dashboard", stats);
+//    }
 
 }
