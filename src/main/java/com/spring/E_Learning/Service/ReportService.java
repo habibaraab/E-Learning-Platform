@@ -1,7 +1,7 @@
 package com.spring.E_Learning.Service;
 
 
-import com.spring.E_Learning.DTOs.ReportDto;
+import com.spring.E_Learning.DTOs.DashboardStatsDto;
 import com.spring.E_Learning.Enum.RequestStatus;
 import com.spring.E_Learning.Enum.Role;
 import com.spring.E_Learning.Repository.*;
@@ -17,7 +17,7 @@ public class ReportService {
     private final ExamRepository examRepository;
     private final StudentRequestRepository studentRequestRepository;
 
-    public ReportDto getDashboardReport() {
+    public DashboardStatsDto getDashboardReport() {
         Long totalStudents = userRepository.countByRole(Role.STUDENT);
         Long totalTeachers = userRepository.countByRole(Role.TEACHER);
         Long totalCourses = courseRepository.count();
@@ -25,7 +25,7 @@ public class ReportService {
         Long totalExams = examRepository.count();
         Long  pendingRequests = studentRequestRepository.countByStatus(RequestStatus.PENDING);
 
-        return new ReportDto(
+        return new DashboardStatsDto(
                 totalStudents,
                 totalTeachers,
                 totalCourses,
@@ -34,6 +34,7 @@ public class ReportService {
                 pendingRequests
         );
     }
+
 
 
 }

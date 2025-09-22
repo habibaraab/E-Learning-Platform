@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReportDto {
+public class DashboardStatsDto {
     private Long totalStudents;
     private Long totalTeachers;
     private Long totalCourses;
