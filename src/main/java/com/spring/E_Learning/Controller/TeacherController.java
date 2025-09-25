@@ -50,6 +50,10 @@ public class TeacherController {
     }
 
 
+
+
+
+
     // Sessions
     @PostMapping(value= "/addSessions", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SessionResponseDto> createSession(
@@ -64,10 +68,31 @@ public class TeacherController {
         return ResponseEntity.ok(sessionService.addSession(dto));
     }
 
-    @GetMapping("/sessionsOfCourse/{courseId}")
+    @GetMapping("/AllSessionsOfCourse/{courseId}")
     public ResponseEntity<List<SessionResponseDto>> getAllSessions(@PathVariable int courseId) {
-        return ResponseEntity.ok(sessionService.getSessionsByCourse(courseId));
+        return ResponseEntity.ok(sessionService.getAllSessionsByCourse(courseId));
     }
+
+
+    @GetMapping("/getSession/{sessionId}")
+    public SessionResponseDto getSession(@PathVariable int sessionId) {
+        return sessionService.getSession(sessionId);
+    }
+
+
+    @PatchMapping("/updateSession/{sessionId}")
+    public SessionResponseDto updateSession(@PathVariable int sessionId,
+                                            @RequestBody SessionRequestDto dto) {
+        return sessionService.updateSession(sessionId, dto);
+    }
+
+    @DeleteMapping("/DeleteSession/{sessionId}")
+    public ResponseEntity<Void> deleteSession(@PathVariable int sessionId) {
+        sessionService.deleteSession(sessionId);
+        return ResponseEntity.noContent().build();
+    }
+
+
 
 
 
@@ -87,6 +112,9 @@ public class TeacherController {
             @PathVariable int examId) {
         return ResponseEntity.ok(examSubmissionService.getExamResults(examId));
     }
+
+
+    
 
 
     @PutMapping("/requestStatus/{request_id}")
