@@ -14,7 +14,7 @@ A complete **E-Learning Platform** supporting **3 types of users**:
 * Approves or rejects teacher accounts with email and notification updates.
 * Monitors student payments and manages all transactions.
 * Activates or rejects courses after review, sending notifications to the respective teacher.
-* Manages the entire platform (users, courses, notifications).
+* Live Dashboard to track the entire platform .
 
 ### 👨‍🏫 Teacher
 * Creates new courses and adds **sessions** (video lessons) with uploaded media.
@@ -41,11 +41,12 @@ A complete **E-Learning Platform** supporting **3 types of users**:
 - **MySQL** as the relational database.
 - **Cloudinary** for media uploads (images, videos).
 - **JavaMailSender** for email notifications (account/course approval or rejection).
+- **WebSocket & SSE** for live notifications and dashboard data.
 - **Lombok** to reduce boilerplate code (`@Data`, `@Builder`, etc.).
 - **Validation API** for request data validation.
 - **MapStruct / DTO Mapping** to separate entities from API responses.
 - **Global Exception Handling** for consistent and clean error responses.
--**Swagger & Postman** for testing Apis
+- **Swagger & Postman** for testing Apis.
 
 ---
 
@@ -53,7 +54,7 @@ A complete **E-Learning Platform** supporting **3 types of users**:
 
 | Role        | Key Endpoints |
 |-------------|---------------|
-| **Admin**   | Approve/Reject teacher accounts, Activate/Reject courses, Manage payments, Send notifications. |
+| **Admin**   | Approve/Reject teacher accounts, Activate/Reject courses, Manage payments, Send notifications ,Live Dashboard. |
 | **Teacher** | Create/Update/Delete courses, Add sessions (video lessons), Upload exams and questions, Update answers, Approve/Reject student requests. |
 | **Student** | Enroll in courses, View enrolled course details, Access sessions of enrolled courses, Take exams and view results, Submit requests for retake or extra views. |
 | **Auth**    | User registration (student/teacher), Login, Password reset. |
