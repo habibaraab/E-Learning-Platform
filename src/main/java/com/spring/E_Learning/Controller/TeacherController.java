@@ -4,7 +4,9 @@ package com.spring.E_Learning.Controller;
 import com.spring.E_Learning.DTOs.*;
 import com.spring.E_Learning.Enum.RequestStatus;
 import com.spring.E_Learning.Service.*;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +24,7 @@ public class TeacherController {
     private final ExamService examService;
     private final ExamSubmissionService examSubmissionService;
     private final StudentRequestService studentRequestService;
+    private QuestionService questionService;
 
     //Courses
 
@@ -98,13 +101,32 @@ public class TeacherController {
 
     //Exams
     @PostMapping("/addExams")
-    public ResponseEntity<ExamResponseDto> createExam(@RequestBody ExamRequestDto dto) {
+    public ResponseEntity<ExamResponseDto> createExam(@Valid @RequestBody ExamRequestDto dto) {
         return ResponseEntity.ok(examService.createExam(dto));
     }
 
-    @GetMapping("/examsOfCourse/{courseId}")
+    @GetMapping("/GetExamsOfCourse/{courseId}")
     public ResponseEntity<List<ExamResponseDto>> getAllExams(@PathVariable int courseId) {
         return ResponseEntity.ok(examService.getExamsByCourse(courseId));
+    }
+
+    @PutMapping("/updateExam/{examId}")
+    public ResponseEntity<ExamResponseDto> updateExam(
+            @PathVariable int examId,
+            @Valid @RequestBody ExamRequestDto dto) {
+        return ResponseEntity.ok(examService.updateExam(examId, dto));
+    }
+
+
+    @GetMapping("/ExamDetails/{examId}")
+    public ResponseEntity<ExamResponseDto> getExamById(@PathVariable int examId) {
+        return ResponseEntity.ok(examService.getExamById(examId));
+    }
+
+    @DeleteMapping("/DeleteExam/{examId}")
+    public ResponseEntity<Void> deleteExam(@PathVariable int examId) {
+        examService.deleteExam(examId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/exams/{examId}/results")
@@ -113,10 +135,54 @@ public class TeacherController {
         return ResponseEntity.ok(examSubmissionService.getExamResults(examId));
     }
 
+    //Questions
+    @PostMapping("/{examId}/AddQuestions")
+    public ResponseEntity<ExamResponseDto> addQuestion(
+            @PathVariable int examId,
+            @Valid @RequestBody QuestionDto questionDto) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(questionService.addQuestion(examId, questionDto));
+    }
+
+    @PutMapping("/{examId}/UdateQuestions/{questionId}")
+    public ResponseEntity<ExamResponseDto> updateQuestion(
+            @PathVariable int examId,
+            @PathVariable int questionId,
+            @Valid @RequestBody QuestionDto dto) {
+        return ResponseEntity.ok(questionService.updateQuestion(examId, questionId, dto));
+    }
+
+
+    @DeleteMapping("/{examId}/DeleteQuestions/{questionId}")
+    public ResponseEntity<Void> deleteQuestion(
+            @PathVariable int examId,
+            @PathVariable int questionId) {
+        questionService.deleteQuestion(examId, questionId);
+        return ResponseEntity.noContent().build();
+    }
+
 
     
 
+    //AnswerOfExam
+    @PutMapping("/{examId}/updateQuestionOptions/{questionId}")
+    public ResponseEntity<List<OptionDto>> updateQuestionOptions(
+            @PathVariable int examId,
+            @PathVariable int questionId,
+            @RequestBody List<OptionDto> options
+    ) {
+        List<OptionDto> updated = questionService.updateQuestionOptions(examId, questionId, options);
+        return ResponseEntity.ok(updated);
+    }
 
+
+
+
+
+
+
+// Request
     @PutMapping("/requestStatus/{request_id}")
     public ResponseEntity<StudentRequestDto> updateStatus(
             @PathVariable int request_id,
