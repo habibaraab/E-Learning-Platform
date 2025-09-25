@@ -98,6 +98,7 @@ public class PaymentService {
                 .collect(Collectors.toList());
     }
 
+
     private PaymentDto mapToDto(Payment p) {
         PaymentDto dto = new PaymentDto();
         dto.setId(p.getId());

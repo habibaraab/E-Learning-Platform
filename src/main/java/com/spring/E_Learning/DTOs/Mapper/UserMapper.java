@@ -1,6 +1,7 @@
 package com.spring.E_Learning.DTOs.Mapper;
 
 
+import com.spring.E_Learning.DTOs.ProfileResponseDto;
 import com.spring.E_Learning.DTOs.UserRequestDto;
 import com.spring.E_Learning.DTOs.UserResponseDto;
 import com.spring.E_Learning.Model.User;
@@ -11,6 +12,7 @@ public interface UserMapper {
 
     UserResponseDto toUserResponseDto(User user);
 
+    ProfileResponseDto toProfileResponseDto(User user);
 
     User toUserEntity(UserRequestDto requestDto);
 
