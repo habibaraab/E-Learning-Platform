@@ -100,26 +100,33 @@ public class StudentRequestService {
     }
 
 
-    public StudentRequestDto updateStatus(int requestId, RequestStatus status) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
 
+
+    public StudentRequestDto approveRequest(int requestId) {
+        return updateRequestStatusInternal(requestId, RequestStatus.APPROVED);
+    }
+
+    public StudentRequestDto rejectRequest(int requestId) {
+        return updateRequestStatusInternal(requestId, RequestStatus.REJECTED);
+    }
+
+
+    private StudentRequestDto updateRequestStatusInternal(int requestId, RequestStatus status) {
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User loggedInUser = userRepository.findUserByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("Logged-in user not found"));
 
         StudentRequest request = studentRequestRepository.findById(requestId)
                 .orElseThrow(() -> new EntityNotFoundException("Request not found"));
 
-        User courseTeacher = request.getCourse().getTeacher();
         if (loggedInUser.getRole() != Role.TEACHER ||
-                loggedInUser.getId() != courseTeacher.getId()) {
+                request.getCourse().getTeacher().getId() != loggedInUser.getId()) {
             throw new AccessDeniedException("You are not allowed to update this request");
         }
 
-
         request.setStatus(status);
         StudentRequest updated = studentRequestRepository.save(request);
-
 
         NotificationDto notif = NotificationDto.builder()
                 .title("Exam Request Update")
@@ -128,7 +135,7 @@ public class StudentRequestService {
                         : "Your exam retake request has been REJECTED.")
                 .userId(updated.getStudent().getId())
                 .createdAt(LocalDateTime.now())
-                .read(true)
+                .read(false)
                 .build();
         notificationService.createNotification(notif);
 
@@ -139,11 +146,9 @@ public class StudentRequestService {
         dto.setType(updated.getType());
         dto.setExamId(updated.getExam() != null ? updated.getExam().getId() : null);
         dto.setStatus(updated.getStatus());
+
         return dto;
     }
-
-
-
 
 
 

@@ -163,7 +163,7 @@ public class TeacherController {
     }
 
 
-    
+
 
     //AnswerOfExam
     @PutMapping("/{examId}/updateQuestionOptions/{questionId}")
@@ -179,15 +179,15 @@ public class TeacherController {
 
 
 
+    // Request
+    @PutMapping("/{requestId}/approveRequest")
+    public ResponseEntity<StudentRequestDto> approveRequest(@PathVariable int requestId) {
+        return ResponseEntity.ok(studentRequestService.approveRequest(requestId));
+    }
 
-
-
-// Request
-    @PutMapping("/requestStatus/{request_id}")
-    public ResponseEntity<StudentRequestDto> updateStatus(
-            @PathVariable int request_id,
-            @RequestParam RequestStatus status) {
-        return ResponseEntity.ok(studentRequestService.updateStatus(request_id, status));
+    @PutMapping("/{requestId}/rejectRequest")
+    public ResponseEntity<StudentRequestDto> rejectRequest(@PathVariable int requestId) {
+        return ResponseEntity.ok(studentRequestService.rejectRequest(requestId));
     }
 
 

@@ -53,34 +53,39 @@ public class AdminController {
 //        messagingTemplate.convertAndSend("/topic/dashboard", stats);
 //    }
 
-    @PatchMapping("/teachers/{teacherId}/enable")
+    @PatchMapping("/teachers/{teacherId}/enableTeacherAccount")
     public ResponseEntity<String> enableTeacher(@PathVariable int teacherId) {
         adminService.enableTeacher(teacherId);
         return ResponseEntity.ok("Teacher account activated");
     }
 
-    @PatchMapping("/teachers/{teacherId}/disable")
-    public ResponseEntity<String> disableUser(@PathVariable int userId) {
-        adminService.disableUser(userId);
+    @PatchMapping("/teachers/{teacherId}/disableTeacherAccount")
+    public ResponseEntity<String> disableUser(@PathVariable int userId,@RequestBody String message) {
+        adminService.rejectTeacher(userId,message);
         return ResponseEntity.ok("User disabled");
     }
 
-    @PutMapping("/{courseId}/activate")
+
+
+
+
+
+    @PutMapping("/{courseId}/activateCourse")
     public ResponseEntity<String> activateCourse(@PathVariable int courseId) {
         adminService.activateCourse(courseId);
         return ResponseEntity.ok("Course activated");
     }
 
-    @PutMapping("/{courseId}/reject")
-    public ResponseEntity<String> rejectCourse(@PathVariable int courseId) {
-        adminService.rejectCourse(courseId);
+    @PutMapping("/{courseId}/rejectCourse")
+    public ResponseEntity<String> rejectCourse(@PathVariable int courseId,@RequestBody String message) {
+        adminService.rejectCourse(courseId,message);
         return ResponseEntity.ok("Course rejected");
     }
 
 
-    @DeleteMapping("/DeleteUser/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable int id) {
-        adminService.deleteUser(id);
+    @DeleteMapping("/DeleteUser/{userId}")
+    public ResponseEntity<String> deleteUser(@PathVariable int userId) {
+        adminService.deleteUser(userId);
         return ResponseEntity.ok("User deleted");
     }
 
