@@ -2,6 +2,7 @@ package com.spring.E_Learning.Controller;
 
 
 import com.spring.E_Learning.DTOs.DashboardStatsDto;
+import com.spring.E_Learning.Enum.CourseStatus;
 import com.spring.E_Learning.Service.AdminService;
 import com.spring.E_Learning.Service.ReportService;
 import lombok.RequiredArgsConstructor;
@@ -23,24 +24,8 @@ public class AdminController {
     private final AdminService adminService;
     private final SimpMessagingTemplate messagingTemplate;
 
-
-
-
-    @PutMapping("/teachers/{teacherId}/enable")
-    public ResponseEntity<String> enableTeacher(@PathVariable int teacherId) {
-        adminService.enableTeacher(teacherId);
-        return ResponseEntity.ok("Teacher account activated");
-    }
-
-    @PutMapping("/users/{userId}/disable")
-    public ResponseEntity<String> disableUser(@PathVariable int userId) {
-        adminService.disableUser(userId);
-        return ResponseEntity.ok("User disabled");
-    }
-
-
     //SSE using Emitter for Live Dashboard
-    @GetMapping( path = "/report/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping( path = "/stream/Dashboard", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter streamStats() {
         SseEmitter emitter = new SseEmitter();
 
@@ -59,11 +44,48 @@ public class AdminController {
         return emitter;
     }
 
+
+
     //WebSocket for LiveDashboard
 //    @Scheduled(fixedRate = 3000)
 //    public void broadcastStats() {
 //        DashboardStatsDto stats = reportService.getDashboardReport();
 //        messagingTemplate.convertAndSend("/topic/dashboard", stats);
 //    }
+
+    @PatchMapping("/teachers/{teacherId}/enable")
+    public ResponseEntity<String> enableTeacher(@PathVariable int teacherId) {
+        adminService.enableTeacher(teacherId);
+        return ResponseEntity.ok("Teacher account activated");
+    }
+
+    @PatchMapping("/teachers/{teacherId}/disable")
+    public ResponseEntity<String> disableUser(@PathVariable int userId) {
+        adminService.disableUser(userId);
+        return ResponseEntity.ok("User disabled");
+    }
+
+    @PutMapping("/{courseId}/activate")
+    public ResponseEntity<String> activateCourse(@PathVariable int courseId) {
+        adminService.activateCourse(courseId);
+        return ResponseEntity.ok("Course activated");
+    }
+
+    @PutMapping("/{courseId}/reject")
+    public ResponseEntity<String> rejectCourse(@PathVariable int courseId) {
+        adminService.rejectCourse(courseId);
+        return ResponseEntity.ok("Course rejected");
+    }
+
+
+    @DeleteMapping("/DeleteUser/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable int id) {
+        adminService.deleteUser(id);
+        return ResponseEntity.ok("User deleted");
+    }
+
+
+
+
 
 }

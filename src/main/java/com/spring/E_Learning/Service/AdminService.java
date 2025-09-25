@@ -1,8 +1,11 @@
 package com.spring.E_Learning.Service;
 
 
+import com.spring.E_Learning.Enum.CourseStatus;
 import com.spring.E_Learning.Enum.Role;
+import com.spring.E_Learning.Model.Course;
 import com.spring.E_Learning.Model.User;
+import com.spring.E_Learning.Repository.CourseRepository;
 import com.spring.E_Learning.Repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AdminService {
     private final UserRepository userRepository;
+    private final CourseRepository courseRepository;
 
     public void enableTeacher(int teacherId) {
         User teacher = userRepository.findById(teacherId)
@@ -31,6 +35,27 @@ public class AdminService {
 
         user.setActiva(false);
         userRepository.save(user);
+    }
+
+    public void deleteUser(int userId) {
+       if (!userRepository.existsById(userId)) {
+           throw new EntityNotFoundException("User not found");
+       }
+       userRepository.deleteById(userId);
+    }
+
+    public void activateCourse(int courseId) {
+
+        Course course = courseRepository.findById(courseId).orElseThrow(() -> new EntityNotFoundException("Course not found"));
+        course.setStatus(CourseStatus.ACTIVE);
+        courseRepository.save(course);
+    }
+
+    public void rejectCourse(int courseId) {
+        Course course = courseRepository.findById(courseId).orElseThrow(() -> new EntityNotFoundException("Course not found"));
+        course.setStatus(CourseStatus.REJECTED);
+        courseRepository.save(course);
+
     }
 }
 

@@ -13,5 +13,5 @@ public class CourseRequestDto {
     private String title;
     private String description;
     private BigDecimal price;
-    private int teacherId;
+    private Integer teacherId;
 }

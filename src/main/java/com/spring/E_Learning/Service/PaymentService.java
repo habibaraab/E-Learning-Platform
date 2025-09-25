@@ -4,6 +4,7 @@ package com.spring.E_Learning.Service;
 
 import com.spring.E_Learning.DTOs.PaymentDto;
 
+import com.spring.E_Learning.Enum.CourseStatus;
 import com.spring.E_Learning.Enum.PaymentStatus;
 import com.spring.E_Learning.Model.Course;
 import com.spring.E_Learning.Model.Enrollment;
@@ -57,6 +58,9 @@ public class PaymentService {
             throw new IllegalStateException("Student already enrolled in this course");
         }
 
+        if (course.getStatus() != CourseStatus.ACTIVE) {
+            throw new IllegalStateException("Course is not activated by admin yet");
+        }
         Payment payment = Payment.builder()
                 .amount(dto.getAmount())
                 .status(PaymentStatus.SUCCESS)

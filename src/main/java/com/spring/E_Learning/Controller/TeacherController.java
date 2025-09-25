@@ -25,25 +25,33 @@ public class TeacherController {
 
     //Courses
 
-    @PostMapping
+    @PostMapping("/addCourse")
     public ResponseEntity<CourseResponseDto> createCourse(@RequestBody CourseRequestDto dto) {
         return ResponseEntity.ok(courseService.createCourse(dto));
     }
 
-    @GetMapping
+    @GetMapping("/myCourses")
     public ResponseEntity<List<CourseResponseDto>> getAllCourses() {
         return ResponseEntity.ok(courseService.getAllCourses());
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCourse(@PathVariable int id ){
-        courseService.deleteCourse(id);
+
+    @PatchMapping("/UpdateCourse/{courseId}")
+    public ResponseEntity<CourseResponseDto> updateCourse(
+            @PathVariable int courseId,
+            @RequestBody CourseRequestDto dto) {
+        return ResponseEntity.ok(courseService.updateCourse(courseId, dto));
+    }
+
+    @DeleteMapping("/DeleteCourse/{courseId}")
+    public ResponseEntity<Void> deleteCourse(@PathVariable int courseId ){
+        courseService.deleteCourse(courseId);
         return ResponseEntity.noContent().build();
     }
 
 
     // Sessions
-    @PostMapping(value= "/sessions", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value= "/addSessions", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SessionResponseDto> createSession(
             @RequestParam String title,
             @RequestParam int courseId,
@@ -56,22 +64,22 @@ public class TeacherController {
         return ResponseEntity.ok(sessionService.addSession(dto));
     }
 
-    @GetMapping("/sessions/Course/{id}")
-    public ResponseEntity<List<SessionResponseDto>> getAllSessions(@PathVariable int id) {
-        return ResponseEntity.ok(sessionService.getSessionsByCourse(id));
+    @GetMapping("/sessionsOfCourse/{courseId}")
+    public ResponseEntity<List<SessionResponseDto>> getAllSessions(@PathVariable int courseId) {
+        return ResponseEntity.ok(sessionService.getSessionsByCourse(courseId));
     }
 
 
 
     //Exams
-    @PostMapping("/exams")
+    @PostMapping("/addExams")
     public ResponseEntity<ExamResponseDto> createExam(@RequestBody ExamRequestDto dto) {
         return ResponseEntity.ok(examService.createExam(dto));
     }
 
-    @GetMapping("/exams/Course/{id}")
-    public ResponseEntity<List<ExamResponseDto>> getAllExams(@PathVariable int id) {
-        return ResponseEntity.ok(examService.getExamsByCourse(id));
+    @GetMapping("/examsOfCourse/{courseId}")
+    public ResponseEntity<List<ExamResponseDto>> getAllExams(@PathVariable int courseId) {
+        return ResponseEntity.ok(examService.getExamsByCourse(courseId));
     }
 
     @GetMapping("/exams/{examId}/results")
@@ -81,7 +89,7 @@ public class TeacherController {
     }
 
 
-    @PutMapping("/{request_id}/status")
+    @PutMapping("/requestStatus/{request_id}")
     public ResponseEntity<StudentRequestDto> updateStatus(
             @PathVariable int request_id,
             @RequestParam RequestStatus status) {

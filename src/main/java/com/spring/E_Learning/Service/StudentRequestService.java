@@ -4,6 +4,7 @@ import com.spring.E_Learning.DTOs.NotificationDto;
 import com.spring.E_Learning.DTOs.StudentRequestDto;
 import com.spring.E_Learning.Enum.RequestStatus;
 import com.spring.E_Learning.Enum.RequestType;
+import com.spring.E_Learning.Enum.Role;
 import com.spring.E_Learning.Model.Course;
 import com.spring.E_Learning.Model.Exam;
 import com.spring.E_Learning.Model.StudentRequest;
@@ -11,6 +12,7 @@ import com.spring.E_Learning.Model.User;
 import com.spring.E_Learning.Repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -98,13 +100,26 @@ public class StudentRequestService {
     }
 
 
-
     public StudentRequestDto updateStatus(int requestId, RequestStatus status) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+
+        User loggedInUser = userRepository.findUserByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("Logged-in user not found"));
+
         StudentRequest request = studentRequestRepository.findById(requestId)
                 .orElseThrow(() -> new EntityNotFoundException("Request not found"));
 
+        User courseTeacher = request.getCourse().getTeacher();
+        if (loggedInUser.getRole() != Role.TEACHER ||
+                loggedInUser.getId() != courseTeacher.getId()) {
+            throw new AccessDeniedException("You are not allowed to update this request");
+        }
+
+
         request.setStatus(status);
         StudentRequest updated = studentRequestRepository.save(request);
+
 
         NotificationDto notif = NotificationDto.builder()
                 .title("Exam Request Update")
@@ -125,8 +140,12 @@ public class StudentRequestService {
         dto.setExamId(updated.getExam() != null ? updated.getExam().getId() : null);
         dto.setStatus(updated.getStatus());
         return dto;
-
     }
+
+
+
+
+
 
     public List<StudentRequestDto> getStudentRequests(int studentId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
