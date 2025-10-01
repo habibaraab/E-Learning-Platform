@@ -1,4 +1,5 @@
 package com.spring.E_Learning.Security;
+import com.spring.E_Learning.Repository.TokenRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +22,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final TokenRepository tokenRepository;
 
     @Override
     protected void doFilterInternal(
@@ -51,7 +53,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
-                if (jwtService.isTokenValid(jwt, userDetails)) {
+                var validateToken = tokenRepository.findByToken(jwt).stream()
+                        .anyMatch(t -> !t.isExpired() && !t.isRevoked());
+
+
+                if (jwtService.isTokenValid(jwt, userDetails)&&validateToken) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,

@@ -93,6 +93,7 @@ public class AuthService {
         String accessToken = jwtService.generateToken(user, claims);
         String refreshToken = jwtService.generateRefreshToken(user);
 
+        revokeAllUserTokens(user);
         saveUserToken(user, accessToken);
 
         log.info("Login process completed successfully for user: {}", request.getEmail());
@@ -101,6 +102,19 @@ public class AuthService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+
+    private void revokeAllUserTokens(User user) {
+        var validateUserToken=tokenRepository.findAllValidTokenByUser(user.getId());
+        if(validateUserToken.isEmpty()){
+            return;
+        }
+        validateUserToken.forEach(t->{
+            t.setExpired(true);
+            t.setRevoked(true);
+        });
+        tokenRepository.saveAll(validateUserToken);
     }
 
     // This method is used to save the JWT token in the database
