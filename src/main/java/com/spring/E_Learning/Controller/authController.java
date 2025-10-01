@@ -3,12 +3,16 @@ package com.spring.E_Learning.Controller;
 
 import com.spring.E_Learning.DTOs.*;
 import com.spring.E_Learning.Service.AuthService;
+import com.spring.E_Learning.Service.LogoutService;
 import com.spring.E_Learning.Service.PasswordResetService;
 import com.spring.E_Learning.Service.ProfileService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +27,7 @@ public class authController {
     private final AuthService authService;
     private final PasswordResetService passwordResetService;
     private final ProfileService profileService;
+    private final LogoutService logoutService;
 
 
 
@@ -62,6 +67,14 @@ public class authController {
     public ResponseEntity<ProfileResponseDto> updateProfile(
             @RequestBody @Valid ProfileUpdateDto dto) {
         return ResponseEntity.ok(profileService.updateProfile(dto));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    Authentication authentication) {
+        logoutService.logout(request, response, authentication);
+        return ResponseEntity.ok("Logged out successfully");
     }
 
 }
